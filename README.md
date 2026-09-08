@@ -8,7 +8,7 @@ A synthesizable full-duplex Serial Peripheral Interface (SPI) Master and Slave c
 
 - **Protocol:** 4-Wire Synchronous Full-Duplex Serial Peripheral Interface (`SCLK`, `MOSI`, `MISO`, `CS_N`)
 - **System Clock:** 100 MHz (T = 10 ns)
-- **Configurable SCLK Frequency:** Parameterized integer divider `CLK_DIV` ($F_{\text{SCLK}} = \frac{F_{\text{CLK}}}{2 \times \text{CLK\_DIV}}$). For `CLK_DIV = 4`, $F_{\text{SCLK}} = 12.5\text{ MHz}$
+- **Configurable SCLK Frequency:** Parameterized integer divider `CLK_DIV` (`F_SCLK = F_CLK / (2 * CLK_DIV)`). For `CLK_DIV = 4`, `F_SCLK = 12.5 MHz` (at 100 MHz reference clock)
 - **Configurable Data Width:** Parameterized `DATA_WIDTH` (8, 16, 32 bits, default: 8-bit)
 - **All 4 SPI Modes Supported:**
   - **Mode 0 (`CPOL=0, CPHA=0`):** SCLK idles LOW; Data sampled on rising edge, shifted on falling edge
@@ -16,8 +16,8 @@ A synthesizable full-duplex Serial Peripheral Interface (SPI) Master and Slave c
   - **Mode 2 (`CPOL=1, CPHA=0`):** SCLK idles HIGH; Data sampled on falling edge, shifted on rising edge
   - **Mode 3 (`CPOL=1, CPHA=1`):** SCLK idles HIGH; Data shifted on falling edge, sampled on rising edge
 - **Bus Integrity:** High-impedance tri-state buffer on `MISO` line during inactive slave selection (`CS_N = 1`)
-- **Framing & Timing:** Enforces standard setup ($T_{\text{CSS}}$) and hold ($T_{\text{CSH}}$) delays before and after SCLK toggling
-- **Verification Methodology:** Layered UVM 1.2 testbench featuring constrained-random stimulus, boundary corner cases, 100% cross-coverage of `CPOL` $\times$ `CPHA`, and self-checking scoreboards
+- **Framing & Timing:** Enforces standard setup (`T_CSS`) and hold (`T_CSH`) delays before and after SCLK toggling
+- **Verification Methodology:** Layered UVM 1.2 testbench featuring constrained-random stimulus, boundary corner cases, 100% cross-coverage of CPOL x CPHA, and self-checking scoreboards
 - **Scoreboard:** Dual FIFO queue-based comparator (`expected_mosi_q[$]` and `expected_miso_q[$]`) validating simultaneous bi-directional full-duplex transmission
 - **Simulation Result:** 49/49 transactions verified with 0 mismatches, 0 protocol errors, and 0 UVM errors
 
@@ -147,7 +147,7 @@ SPI/
   - Independent random data streams on Master and Slave channels to rigorously validate bi-directional full-duplex communication.
 
 ### 2. Functional Coverage Model (`spi_coverage.sv`)
-- **Mode Coverage:** 100% cross-coverage of `cpol_cp` $\times$ `cpha_cp` covering all 4 standard SPI operational modes.
+- **Mode Coverage:** 100% cross-coverage of `cpol_cp` x `cpha_cp` covering all 4 standard SPI operational modes.
 - **Data Range Bins:**
   - `low`: `[8'h00 : 8'h3F]`
   - `mid`: `[8'h40 : 8'hBF]`
